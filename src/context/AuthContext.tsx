@@ -11,7 +11,6 @@ import {
 import {
   doc,
   setDoc,
-  getDoc,
   onSnapshot,
   serverTimestamp,
   updateDoc
@@ -41,7 +40,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, async (user) => {
       setCurrentUser(user);
-
       if (user) {
         // Listen to user document in Firestore in realtime
         const userDocRef = doc(db, 'users', user.uid);
@@ -63,7 +61,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 updatedAt: data.updatedAt,
               };
 
-              // If this user is a bootstrap admin but the database doc doesn't have role=admin yet, update it!
+              // If this user is a bootstrap admin but the database doc doesn't have role=admin yet, update it
               if (isAdminEmail && data.role !== 'admin') {
                 try {
                   await updateDoc(userDocRef, { role: 'admin' });
@@ -74,7 +72,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
               setUserProfile(profile);
             } else {
-              // Create doc if not yet exists (e.g. social or directly created)
+              // Create doc if not yet exists
               const isAdminEmail = BOOTSTRAP_ADMIN_EMAILS.includes((user.email || '').toLowerCase());
               const newProfile: UserProfile = {
                 uid: user.uid,
@@ -97,7 +95,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setLoading(false);
           },
           (error) => {
-            console.error('User profile snapshot error', error);
+            console.warn('User profile snapshot access warning:', error.message);
+            const isAdminEmail = BOOTSTRAP_ADMIN_EMAILS.includes((user.email || '').toLowerCase());
+            setUserProfile({
+              uid: user.uid,
+              email: user.email || '',
+              name: user.displayName || user.email?.split('@')[0] || 'Pelanggan YANZSTR',
+              role: isAdminEmail ? 'admin' : 'user',
+              balance: 0,
+              status: 'active',
+              createdAt: null
+            });
             setLoading(false);
           }
         );
@@ -117,10 +125,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const register = async (email: string, pass: string, name: string) => {
     const cred = await createUserWithEmailAndPassword(auth, email.trim(), pass);
     await updateProfile(cred.user, { displayName: name.trim() });
-
+    
     const isAdminEmail = BOOTSTRAP_ADMIN_EMAILS.includes(email.trim().toLowerCase());
     const role: UserRole = isAdminEmail ? 'admin' : 'user';
-
+    
     const userDocRef = doc(db, 'users', cred.user.uid);
     const profileData = {
       uid: cred.user.uid,

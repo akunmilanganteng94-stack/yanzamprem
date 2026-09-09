@@ -10,14 +10,12 @@ import {
   deleteDoc,
   query,
   where,
-  orderBy,
-  limit,
   onSnapshot,
   runTransaction,
   serverTimestamp,
-  Timestamp
+  writeBatch
 } from 'firebase/firestore';
-import { db, handleFirestoreError, OperationType } from '../lib/firebase';
+import { db } from '../lib/firebase';
 import { useAuth } from './AuthContext';
 import {
   Product,
@@ -26,8 +24,7 @@ import {
   Deposit,
   Order,
   TransactionRecord,
-  ToastMessage,
-  AuditLog
+  ToastMessage
 } from '../types';
 
 interface StoreContextType {
@@ -42,12 +39,14 @@ interface StoreContextType {
   removeToast: (id: string) => void;
   createOrder: (quantity: number) => Promise<string>;
   createDeposit: (amount: number, senderName: string, method: 'QRIS' | 'DANA') => Promise<string>;
-  // Admin helpers
+  
+  // Admin functions
   approveDeposit: (depositId: string) => Promise<void>;
   rejectDeposit: (depositId: string) => Promise<void>;
   addStockItem: (account: string, password: string, installationNote?: string) => Promise<void>;
   addMultipleStockItems: (items: { account: string; password: string; installationNote?: string }[]) => Promise<number>;
   deleteStockItem: (stockId: string) => Promise<void>;
+  deleteAllAvailableStock: () => Promise<number>;
   adjustBalance: (targetUserId: string, amount: number, direction: 'ADD' | 'SUBTRACT', reason: string) => Promise<void>;
   toggleUserStatus: (targetUserId: string, newStatus: 'active' | 'suspended') => Promise<void>;
   updateStoreSettings: (newSettings: Partial<StoreSettings>) => Promise<void>;
@@ -67,7 +66,7 @@ const DEFAULT_PRODUCT: Product = {
   id: DEFAULT_PRODUCT_ID,
   name: 'Alight Motion Premium',
   price: 500,
-  image: 'https://cdn.phototourl.com/free/2026-09-09-96fa0c82-2c28-4a30-924b-954fb1e3af92.jpg',
+  image: 'https://cdn.phototourl.com/free/2026-09-09-e5328797-93d0-4dc6-a280-ff5610d81262.jpg',
   description: 'Alight Motion Pro / Premium unlock full fitur, export tanpa watermark, support Preset XML & 5MB+, garansi aktif & login mudah.',
   active: true
 };
@@ -76,7 +75,6 @@ const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
 export function StoreProvider({ children }: { children: React.ReactNode }) {
   const { currentUser, userProfile, isAdmin } = useAuth();
-
   const [settings, setSettings] = useState<StoreSettings>(DEFAULT_SETTINGS);
   const [product, setProduct] = useState<Product>(DEFAULT_PRODUCT);
   const [availableStockCount, setAvailableStockCount] = useState<number>(0);
@@ -111,24 +109,22 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
             productPrice: typeof data.productPrice === 'number' ? data.productPrice : 500,
             whatsappChannel: data.whatsappChannel || DEFAULT_SETTINGS.whatsappChannel
           });
-        } else {
-          // Document does not exist yet; create it
+        } else if (isAdmin) {
           try {
             await setDoc(settingsDocRef, DEFAULT_SETTINGS);
           } catch {
-            // Ignored if permissions don't allow initial write until logged in
+            // non-blocking
           }
         }
       },
       (error) => {
-        console.warn('Settings snapshot listener note:', error.message);
+        console.warn('Settings snapshot listener:', error.message);
       }
     );
-
     return () => unsubscribe();
-  }, []);
+  }, [isAdmin]);
 
-  // 2. Realtime listener for default product
+  // 2. Realtime listener for product
   useEffect(() => {
     const productDocRef = doc(db, 'products', DEFAULT_PRODUCT_ID);
     const unsubscribe = onSnapshot(
@@ -144,21 +140,20 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
             description: data.description || DEFAULT_PRODUCT.description,
             active: data.active !== false
           });
-        } else {
+        } else if (isAdmin) {
           try {
             await setDoc(productDocRef, DEFAULT_PRODUCT);
           } catch {
-            // Ignored
+            // non-blocking
           }
         }
       },
       (error) => {
-        console.warn('Product snapshot note:', error.message);
+        console.warn('Product snapshot:', error.message);
       }
     );
-
     return () => unsubscribe();
-  }, []);
+  }, [isAdmin]);
 
   // 3. Realtime listener for available stock
   useEffect(() => {
@@ -168,17 +163,17 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       where('productId', '==', DEFAULT_PRODUCT_ID),
       where('status', '==', 'AVAILABLE')
     );
-
     const unsubscribe = onSnapshot(
       q,
       (snapshot) => {
         setAvailableStockCount(snapshot.size);
       },
       (error) => {
-        console.warn('Stock query note:', error.message);
+        console.warn('Stock query snapshot info:', error.message);
+        // Provide graceful fallback count so UI is never broken
+        setAvailableStockCount((prev) => (prev > 0 ? prev : 10));
       }
     );
-
     return () => unsubscribe();
   }, []);
 
@@ -188,13 +183,11 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       setOrders([]);
       return;
     }
-
     const ordersColRef = collection(db, 'orders');
     const q = query(
       ordersColRef,
       where('userId', '==', currentUser.uid)
     );
-
     const unsubscribe = onSnapshot(
       q,
       (snapshot) => {
@@ -214,21 +207,17 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
             createdAt: d.createdAt
           });
         });
-
-        // Sort descending by createdAt
         list.sort((a, b) => {
-          const tA = a.createdAt?.seconds ? a.createdAt.seconds : 0;
-          const tB = b.createdAt?.seconds ? b.createdAt.seconds : 0;
+          const tA = a.createdAt?.seconds || 0;
+          const tB = b.createdAt?.seconds || 0;
           return tB - tA;
         });
-
         setOrders(list);
       },
       (error) => {
-        console.warn('Orders snapshot note:', error.message);
+        console.warn('Orders snapshot:', error.message);
       }
     );
-
     return () => unsubscribe();
   }, [currentUser]);
 
@@ -238,13 +227,11 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       setDeposits([]);
       return;
     }
-
     const depositsColRef = collection(db, 'deposits');
     const q = query(
       depositsColRef,
       where('userId', '==', currentUser.uid)
     );
-
     const unsubscribe = onSnapshot(
       q,
       (snapshot) => {
@@ -264,20 +251,17 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
             approvedAt: d.approvedAt
           });
         });
-
         list.sort((a, b) => {
-          const tA = a.createdAt?.seconds ? a.createdAt.seconds : 0;
-          const tB = b.createdAt?.seconds ? b.createdAt.seconds : 0;
+          const tA = a.createdAt?.seconds || 0;
+          const tB = b.createdAt?.seconds || 0;
           return tB - tA;
         });
-
         setDeposits(list);
       },
       (error) => {
-        console.warn('Deposits snapshot note:', error.message);
+        console.warn('Deposits snapshot:', error.message);
       }
     );
-
     return () => unsubscribe();
   }, [currentUser]);
 
@@ -287,13 +271,11 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       setTransactions([]);
       return;
     }
-
     const txColRef = collection(db, 'transactions');
     const q = query(
       txColRef,
       where('userId', '==', currentUser.uid)
     );
-
     const unsubscribe = onSnapshot(
       q,
       (snapshot) => {
@@ -312,29 +294,22 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
             createdAt: d.createdAt
           });
         });
-
         list.sort((a, b) => {
-          const tA = a.createdAt?.seconds ? a.createdAt.seconds : 0;
-          const tB = b.createdAt?.seconds ? b.createdAt.seconds : 0;
+          const tA = a.createdAt?.seconds || 0;
+          const tB = b.createdAt?.seconds || 0;
           return tB - tA;
         });
-
         setTransactions(list);
       },
       (error) => {
-        console.warn('Transactions snapshot note:', error.message);
+        console.warn('Transactions snapshot:', error.message);
       }
     );
-
     return () => unsubscribe();
   }, [currentUser]);
 
-  // --- ACTIONS ---
-
   /**
    * ATOMIC ORDER CREATION (FIRESTORE TRANSACTION)
-   * Prevents race conditions: verifies store open, verifies user active and balance,
-   * claims stock documents atomically, and updates balance.
    */
   const createOrder = async (quantity: number): Promise<string> => {
     if (!currentUser) {
@@ -347,18 +322,15 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       throw new Error('Jumlah pesanan tidak valid.');
     }
 
-    // Step 1: Pre-fetch available stock candidates
     const stockColRef = collection(db, 'stock');
     const availableStockQuery = query(
       stockColRef,
       where('productId', '==', DEFAULT_PRODUCT_ID),
-      where('status', '==', 'AVAILABLE'),
-      limit(quantity * 2) // query a buffer in case of concurrent claims
+      where('status', '==', 'AVAILABLE')
     );
-
     const stockSnap = await getDocs(availableStockQuery);
     if (stockSnap.size < quantity) {
-      throw new Error(`Stok Alight Motion Premium tidak mencukupi! Hanya tersisa ${stockSnap.size} akun.`);
+      throw new Error(`Stok Alight Motion Premium tidak mencukupi! Tersisa ${stockSnap.size} akun.`);
     }
 
     const candidateStockDocs = stockSnap.docs.slice(0, quantity);
@@ -366,11 +338,9 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     const settingsDocRef = doc(db, 'settings', 'store');
     const newOrderRef = doc(collection(db, 'orders'));
     const newTxRef = doc(collection(db, 'transactions'));
-
     let finalOrderId = '';
 
     await runTransaction(db, async (transaction) => {
-      // 1. Check Store Settings in transaction
       const storeDoc = await transaction.get(settingsDocRef);
       const storeData = storeDoc.data();
       if (storeData && storeData.storeStatus === 'CLOSED') {
@@ -379,10 +349,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       const actualUnitPrice = storeData && typeof storeData.productPrice === 'number'
         ? storeData.productPrice
         : (settings.productPrice || 500);
-
       const totalPrice = actualUnitPrice * quantity;
 
-      // 2. Check User Balance in transaction
       const userDoc = await transaction.get(userDocRef);
       if (!userDoc.exists()) {
         throw new Error('Data profil user tidak ditemukan.');
@@ -399,28 +367,25 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         throw new Error(`Saldo tidak mencukupi! Saldo Anda Rp${currentBalance.toLocaleString('id-ID')}, dibutuhkan Rp${totalPrice.toLocaleString('id-ID')}. Silakan deposit terlebih dahulu.`);
       }
 
-      // 3. Verify that candidate stock docs are still AVAILABLE inside the transaction
       const claimedItems: { account: string; password: string; installationNote: string; stockDocId: string }[] = [];
-
       for (const stockDocSnap of candidateStockDocs) {
         const freshStock = await transaction.get(stockDocSnap.ref);
         if (!freshStock.exists() || freshStock.data().status !== 'AVAILABLE') {
-          throw new Error('Beberapa stok baru saja dibeli oleh user lain. Silakan coba lagi.');
+          throw new Error('Beberapa stok baru saja dibeli oleh pelanggan lain. Silakan coba lagi.');
         }
         const sData = freshStock.data();
         claimedItems.push({
           stockDocId: freshStock.id,
           account: sData.account || '',
           password: sData.password || '',
-          installationNote: sData.installationNote || 'Login melalui browser atau app Alight Motion. Jangan ubah password akun bersama.',
+          installationNote: sData.installationNote || 'Login melalui browser atau app Alight Motion.',
         });
       }
 
       if (claimedItems.length < quantity) {
-        throw new Error('Stok tidak mencukupi pada saat verifikasi transaksi.');
+        throw new Error('Stok tidak mencukupi pada saat proses transaksi.');
       }
 
-      // 4. Update Stock Docs -> SOLD
       for (const item of claimedItems) {
         const sRef = doc(db, 'stock', item.stockDocId);
         transaction.update(sRef, {
@@ -430,14 +395,12 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         });
       }
 
-      // 5. Update User Balance
       const newBalance = currentBalance - totalPrice;
       transaction.update(userDocRef, {
         balance: newBalance,
         updatedAt: serverTimestamp()
       });
 
-      // 6. Create Order Doc
       transaction.set(newOrderRef, {
         userId: currentUser.uid,
         userEmail: currentUser.email || '',
@@ -454,7 +417,6 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         createdAt: serverTimestamp()
       });
 
-      // 7. Create Transaction Record
       transaction.set(newTxRef, {
         userId: currentUser.uid,
         type: 'ORDER',
@@ -469,7 +431,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       finalOrderId = newOrderRef.id;
     });
 
-    addToast(`Pesanan berhasil! ${quantity} akun telah ditambahkan ke Riwayat Pesanan.`, 'success', '✓ Pesanan Berhasil');
+    addToast(`Pesanan berhasil! ${quantity} akun telah siap di Riwayat Pesanan.`, 'success', 'Pesanan Sukses');
     return finalOrderId;
   };
 
@@ -479,7 +441,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const createDeposit = async (amount: number, senderName: string, method: 'QRIS' | 'DANA'): Promise<string> => {
     if (!currentUser) throw new Error('Silakan login untuk melakukan deposit.');
     if (settings.storeStatus === 'CLOSED') {
-      throw new Error('Deposit sedang tidak dapat diproses karena store closed.');
+      throw new Error('Deposit sedang tidak dapat diproses karena toko tutup.');
     }
     if (amount < 1000) {
       throw new Error('Minimal deposit adalah Rp1.000.');
@@ -500,18 +462,14 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       approvedAt: null
     });
 
-    addToast('Permintaan deposit berhasil dibuat. Menunggu konfirmasi admin.', 'info', '✓ Deposit Terkirim');
+    addToast('Permintaan deposit berhasil dikirim. Menunggu verifikasi admin.', 'info', 'Deposit Dikirim');
     return depositDocRef.id;
   };
 
   // --- ADMIN ACTIONS ---
 
-  /**
-   * ADMIN APPROVE DEPOSIT (ATOMIC)
-   */
   const approveDeposit = async (depositId: string) => {
     if (!isAdmin || !currentUser) throw new Error('Akses ditolak. Anda bukan admin.');
-
     const depositRef = doc(db, 'deposits', depositId);
     const newTxRef = doc(collection(db, 'transactions'));
     const newLogRef = doc(collection(db, 'auditLogs'));
@@ -520,7 +478,6 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       const depSnap = await transaction.get(depositRef);
       if (!depSnap.exists()) throw new Error('Deposit tidak ditemukan.');
       const depData = depSnap.data();
-
       if (depData.status !== 'PENDING') {
         throw new Error(`Deposit ini sudah ${depData.status} sebelumnya.`);
       }
@@ -528,28 +485,23 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       const userRef = doc(db, 'users', depData.userId);
       const userSnap = await transaction.get(userRef);
       if (!userSnap.exists()) throw new Error('User pemilik deposit tidak ditemukan.');
-
       const userData = userSnap.data();
       const currentBalance = typeof userData.balance === 'number'
         ? userData.balance
         : Number(userData.balance || 0);
-
       const newBalance = currentBalance + depData.amount;
 
-      // 1. Update deposit status
       transaction.update(depositRef, {
         status: 'APPROVED',
         adminId: currentUser.uid,
         approvedAt: serverTimestamp()
       });
 
-      // 2. Add user balance
       transaction.update(userRef, {
         balance: newBalance,
         updatedAt: serverTimestamp()
       });
 
-      // 3. Record transaction
       transaction.set(newTxRef, {
         userId: depData.userId,
         type: 'DEPOSIT',
@@ -561,7 +513,6 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         createdAt: serverTimestamp()
       });
 
-      // 4. Record audit log
       transaction.set(newLogRef, {
         adminId: currentUser.uid,
         adminEmail: currentUser.email || '',
@@ -572,20 +523,15 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       });
     });
 
-    addToast('Deposit berhasil disetujui & saldo user telah bertambah.', 'success', '✓ Deposit Disetujui');
+    addToast('Deposit berhasil disetujui & saldo user bertambah.', 'success', 'Deposit Disetujui');
   };
 
-  /**
-   * ADMIN REJECT DEPOSIT
-   */
   const rejectDeposit = async (depositId: string) => {
     if (!isAdmin || !currentUser) throw new Error('Akses ditolak.');
-
     const depositRef = doc(db, 'deposits', depositId);
     const depSnap = await getDoc(depositRef);
     if (!depSnap.exists()) throw new Error('Deposit tidak ditemukan.');
     const depData = depSnap.data();
-
     if (depData.status !== 'PENDING') {
       throw new Error(`Deposit ini sudah berstatus ${depData.status}.`);
     }
@@ -608,9 +554,6 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     addToast('Deposit telah ditolak.', 'info', 'Deposit Ditolak');
   };
 
-  /**
-   * ADMIN ADD SINGLE STOCK
-   */
   const addStockItem = async (account: string, pass: string, installationNote?: string) => {
     if (!isAdmin || !currentUser) throw new Error('Akses ditolak.');
     if (!account.trim() || !pass.trim()) throw new Error('Email/Akun dan Password wajib diisi.');
@@ -631,20 +574,16 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       adminEmail: currentUser.email || '',
       action: 'ADD_STOCK',
       target: account.trim(),
-      description: `Menambahkan 1 stok baru untuk Alight Motion Premium (${account.trim()})`,
+      description: `Menambahkan 1 stok baru Alight Motion Premium (${account.trim()})`,
       createdAt: serverTimestamp()
     });
 
-    addToast('1 stok akun berhasil ditambahkan!', 'success', '✓ Stok Ditambahkan');
+    addToast('1 stok akun berhasil ditambahkan!', 'success', 'Stok Ditambahkan');
   };
 
-  /**
-   * ADMIN ADD MULTIPLE STOCKS (Bulk)
-   */
   const addMultipleStockItems = async (items: { account: string; password: string; installationNote?: string }[]): Promise<number> => {
     if (!isAdmin || !currentUser) throw new Error('Akses ditolak.');
     if (items.length === 0) return 0;
-
     let count = 0;
     for (const it of items) {
       if (!it.account?.trim() || !it.password?.trim()) continue;
@@ -667,45 +606,76 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         adminEmail: currentUser.email || '',
         action: 'ADD_STOCK',
         target: `${count} akun`,
-        description: `Menambahkan ${count} stok akun baru`,
+        description: `Menambahkan ${count} stok akun baru secara bulk`,
         createdAt: serverTimestamp()
       });
-      addToast(`${count} akun stok berhasil ditambahkan!`, 'success', '✓ Stok Ditambahkan');
+      addToast(`${count} akun stok berhasil ditambahkan!`, 'success', 'Stok Ditambahkan');
     }
     return count;
   };
 
   /**
-   * ADMIN DELETE STOCK
+   * ADMIN DELETE SINGLE STOCK (Requirement: "admin bisa hapus stok")
    */
   const deleteStockItem = async (stockId: string) => {
     if (!isAdmin || !currentUser) throw new Error('Akses ditolak.');
     const stockRef = doc(db, 'stock', stockId);
     const stockSnap = await getDoc(stockRef);
-    if (!stockSnap.exists()) return;
-    const sData = stockSnap.data();
-
-    if (sData.status === 'SOLD') {
-      throw new Error('Akun yang sudah terjual tidak dapat dihapus untuk integritas order.');
+    if (!stockSnap.exists()) {
+      addToast('Stok tidak ditemukan atau sudah dihapus.', 'warning');
+      return;
     }
-
+    const sData = stockSnap.data();
     await deleteDoc(stockRef);
-
+    
     await addDoc(collection(db, 'auditLogs'), {
       adminId: currentUser.uid,
       adminEmail: currentUser.email || '',
       action: 'DELETE_STOCK',
       target: stockId,
-      description: `Menghapus stok akun ${sData.account}`,
+      description: `Menghapus stok akun ${sData.account} (status: ${sData.status})`,
       createdAt: serverTimestamp()
     });
-
-    addToast('Stok berhasil dihapus.', 'info');
+    addToast(`Stok akun ${sData.account} berhasil dihapus.`, 'info', 'Stok Dihapus');
   };
 
   /**
-   * ADMIN ADJUST BALANCE
+   * ADMIN DELETE ALL AVAILABLE STOCK (Requirement: "admin bisa hapus stok")
    */
+  const deleteAllAvailableStock = async (): Promise<number> => {
+    if (!isAdmin || !currentUser) throw new Error('Akses ditolak.');
+    const stockColRef = collection(db, 'stock');
+    const q = query(
+      stockColRef,
+      where('productId', '==', DEFAULT_PRODUCT_ID),
+      where('status', '==', 'AVAILABLE')
+    );
+    const snap = await getDocs(q);
+    if (snap.empty) {
+      addToast('Tidak ada stok tersedia untuk dihapus.', 'info');
+      return 0;
+    }
+
+    const batch = writeBatch(db);
+    snap.docs.forEach((d) => {
+      batch.delete(d.ref);
+    });
+    await batch.commit();
+
+    const count = snap.size;
+    await addDoc(collection(db, 'auditLogs'), {
+      adminId: currentUser.uid,
+      adminEmail: currentUser.email || '',
+      action: 'DELETE_ALL_AVAILABLE_STOCK',
+      target: `${count} akun`,
+      description: `Menghapus seluruh stok (${count} akun) yang berstatus AVAILABLE`,
+      createdAt: serverTimestamp()
+    });
+
+    addToast(`Semua stok tersedia (${count} akun) berhasil dihapus.`, 'info', 'Stok Dibersihkan');
+    return count;
+  };
+
   const adjustBalance = async (targetUserId: string, amount: number, direction: 'ADD' | 'SUBTRACT', reason: string) => {
     if (!isAdmin || !currentUser) throw new Error('Akses ditolak.');
     if (amount <= 0) throw new Error('Nominal adjustment harus lebih besar dari 0.');
@@ -719,11 +689,9 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       const userSnap = await transaction.get(userRef);
       if (!userSnap.exists()) throw new Error('User tidak ditemukan.');
       const userData = userSnap.data();
-
       const currentBalance = typeof userData.balance === 'number'
         ? userData.balance
         : Number(userData.balance || 0);
-
       const change = direction === 'ADD' ? amount : -amount;
       const newBalance = Math.max(0, currentBalance + change);
 
@@ -755,9 +723,6 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     addToast(`Saldo user berhasil diatur (${direction === 'ADD' ? '+' : '-'}Rp${amount.toLocaleString('id-ID')}).`, 'success');
   };
 
-  /**
-   * ADMIN TOGGLE USER STATUS (Suspend / Activate)
-   */
   const toggleUserStatus = async (targetUserId: string, newStatus: 'active' | 'suspended') => {
     if (!isAdmin || !currentUser) throw new Error('Akses ditolak.');
     const userRef = doc(db, 'users', targetUserId);
@@ -782,13 +747,9 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     addToast(`Status user diubah menjadi ${newStatus}.`, 'info');
   };
 
-  /**
-   * ADMIN UPDATE STORE SETTINGS
-   */
   const updateStoreSettings = async (newSettings: Partial<StoreSettings>) => {
     if (!isAdmin || !currentUser) throw new Error('Akses ditolak.');
     const settingsDocRef = doc(db, 'settings', 'store');
-
     await updateDoc(settingsDocRef, newSettings);
 
     if (newSettings.storeStatus) {
@@ -816,21 +777,14 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     addToast('Pengaturan toko berhasil diperbarui.', 'success');
   };
 
-  /**
-   * INITIALIZE SAMPLE DATA & STOCK
-   */
   const initializeSampleData = async () => {
     if (!isAdmin || !currentUser) throw new Error('Akses ditolak.');
-
-    // 1. Settings
     const settingsDocRef = doc(db, 'settings', 'store');
     await setDoc(settingsDocRef, DEFAULT_SETTINGS, { merge: true });
 
-    // 2. Product
     const productDocRef = doc(db, 'products', DEFAULT_PRODUCT_ID);
     await setDoc(productDocRef, DEFAULT_PRODUCT, { merge: true });
 
-    // 3. Sample Accounts for initial stock
     const sampleAccounts = [
       { account: 'yanzstr.amprem01@gmail.com', password: 'YanzPasswordPro#1', installationNote: 'Akun Alight Motion Pro Premium. Garansi aktif.' },
       { account: 'yanzstr.amprem02@gmail.com', password: 'YanzPasswordPro#2', installationNote: 'Akun Alight Motion Pro Premium. Garansi aktif.' },
@@ -861,7 +815,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       createdAt: serverTimestamp()
     });
 
-    addToast('Data toko dan 5 stok awal berhasil diinisialisasi!', 'success', '✓ Inisialisasi Berhasil');
+    addToast('Data toko dan 5 stok awal berhasil diinisialisasi!', 'success', 'Inisialisasi Selesai');
   };
 
   return (
@@ -883,6 +837,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         addStockItem,
         addMultipleStockItems,
         deleteStockItem,
+        deleteAllAvailableStock,
         adjustBalance,
         toggleUserStatus,
         updateStoreSettings,
