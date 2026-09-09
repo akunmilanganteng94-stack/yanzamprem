@@ -1,0 +1,161 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User account profile and wallet balance",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "name": { "type": "string" },
+        "role": { "type": "string", "enum": ["user", "admin"] },
+        "balance": { "type": "number" },
+        "status": { "type": "string", "enum": ["active", "suspended"] },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["uid", "email", "name", "role", "balance", "status"]
+    },
+    "Product": {
+      "title": "Product",
+      "description": "Digital product information for Alight Motion Premium",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "price": { "type": "number" },
+        "image": { "type": "string" },
+        "description": { "type": "string" },
+        "active": { "type": "boolean" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "name", "price", "active"]
+    },
+    "StoreSettings": {
+      "title": "StoreSettings",
+      "description": "Global store settings and configurations",
+      "type": "object",
+      "properties": {
+        "storeName": { "type": "string" },
+        "storeStatus": { "type": "string", "enum": ["OPEN", "CLOSED"] },
+        "productPrice": { "type": "number" },
+        "whatsappChannel": { "type": "string" }
+      },
+      "required": ["storeName", "storeStatus", "productPrice"]
+    },
+    "StockItem": {
+      "title": "StockItem",
+      "description": "Digital account credentials for premium Alight Motion accounts",
+      "type": "object",
+      "properties": {
+        "productId": { "type": "string" },
+        "account": { "type": "string" },
+        "password": { "type": "string" },
+        "installationNote": { "type": "string" },
+        "status": { "type": "string", "enum": ["AVAILABLE", "SOLD"] },
+        "orderId": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "soldAt": { "type": "string" }
+      },
+      "required": ["productId", "account", "password", "status"]
+    },
+    "Deposit": {
+      "title": "Deposit",
+      "description": "User balance deposit request (QRIS or DANA)",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "userEmail": { "type": "string" },
+        "amount": { "type": "number" },
+        "senderName": { "type": "string" },
+        "paymentMethod": { "type": "string", "enum": ["QRIS", "DANA"] },
+        "status": { "type": "string", "enum": ["PENDING", "APPROVED", "REJECTED"] },
+        "adminId": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "approvedAt": { "type": "string" }
+      },
+      "required": ["userId", "amount", "senderName", "paymentMethod", "status"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "Customer purchase order for Alight Motion Premium accounts",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "userEmail": { "type": "string" },
+        "productId": { "type": "string" },
+        "productName": { "type": "string" },
+        "quantity": { "type": "number" },
+        "totalPrice": { "type": "number" },
+        "items": { "type": "array" },
+        "status": { "type": "string", "enum": ["SUCCESS", "CANCELLED"] },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["userId", "productId", "quantity", "totalPrice", "status"]
+    },
+    "TransactionRecord": {
+      "title": "TransactionRecord",
+      "description": "User wallet transaction record",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "type": { "type": "string", "enum": ["DEPOSIT", "ORDER", "ADJUSTMENT"] },
+        "amount": { "type": "number" },
+        "balanceBefore": { "type": "number" },
+        "balanceAfter": { "type": "number" },
+        "referenceId": { "type": "string" },
+        "description": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["userId", "type", "amount", "balanceBefore", "balanceAfter", "description"]
+    },
+    "AuditLog": {
+      "title": "AuditLog",
+      "description": "Administrative actions audit log",
+      "type": "object",
+      "properties": {
+        "adminId": { "type": "string" },
+        "adminEmail": { "type": "string" },
+        "action": { "type": "string" },
+        "target": { "type": "string" },
+        "description": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["adminId", "action", "description"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User profile and balance store"
+    },
+    "/products/{productId}": {
+      "schema": "Product",
+      "description": "Store products catalogue"
+    },
+    "/settings/{settingId}": {
+      "schema": "StoreSettings",
+      "description": "Global store configuration"
+    },
+    "/stock/{stockId}": {
+      "schema": "StockItem",
+      "description": "Premium stock credentials"
+    },
+    "/deposits/{depositId}": {
+      "schema": "Deposit",
+      "description": "User deposit requests"
+    },
+    "/orders/{orderId}": {
+      "schema": "Order",
+      "description": "Customer purchase orders"
+    },
+    "/transactions/{transactionId}": {
+      "schema": "TransactionRecord",
+      "description": "Customer balance transaction logs"
+    },
+    "/auditLogs/{logId}": {
+      "schema": "AuditLog",
+      "description": "Admin action history"
+    }
+  }
+}
