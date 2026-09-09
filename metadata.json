@@ -1,0 +1,6 @@
+{
+  "name": "YANZSTR - Premium Digital Store",
+  "description": "Toko digital resmi YANZSTR menjual produk Alight Motion Premium cepat, otomatis, dan terpercaya.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
