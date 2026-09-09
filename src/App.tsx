@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import { StoreProvider, useStore } from './context/StoreContext';
+import { StoreProvider } from './context/StoreContext';
 import Navbar from './components/Navbar';
 import MobileBottomNav from './components/MobileBottomNav';
 import HomeView from './components/HomeView';
@@ -20,8 +20,6 @@ import Toast from './components/Toast';
 
 function StoreApp() {
   const { currentUser, isAdmin } = useAuth();
-  const { toasts, removeToast } = useStore();
-
   const [currentTab, setCurrentTab] = useState<string>('home');
   const [authModalOpen, setAuthModalOpen] = useState<boolean>(false);
   const [authInitialMode, setAuthInitialMode] = useState<'login' | 'register'>('login');
@@ -58,7 +56,7 @@ function StoreApp() {
     setConfirmModalOpen(true);
   };
 
-  const handleSuccessOrder = (orderId: string) => {
+  const handleSuccessOrder = (_orderId: string) => {
     handleTabChange('orders');
   };
 
@@ -67,7 +65,7 @@ function StoreApp() {
   };
 
   return (
-    <div className="min-h-screen bg-[#050507] text-zinc-100 flex flex-col selection:bg-white selection:text-black">
+    <div className="min-h-screen bg-[#07050e] text-[#f4f4f6] flex flex-col selection:bg-purple-600 selection:text-white">
       {/* Navbar */}
       <Navbar
         currentTab={currentTab}
@@ -77,7 +75,7 @@ function StoreApp() {
       />
 
       {/* Main Content View */}
-      <main className="flex-1 max-w-7xl w-full mx-auto pb-20 md:pb-12">
+      <main className="flex-1 max-w-7xl w-full mx-auto pb-24 md:pb-12 px-2 sm:px-4">
         {currentTab === 'home' && (
           <HomeView
             onOpenConfirm={handleOpenConfirm}
@@ -86,15 +84,12 @@ function StoreApp() {
             onOpenWhatsApp={() => setWhatsappModalOpen(true)}
           />
         )}
-
         {currentTab === 'deposit' && (
           <DepositView onOpenAuth={() => handleOpenAuth('login')} />
         )}
-
         {currentTab === 'orders' && (
           <OrdersView onOpenAuth={() => handleOpenAuth('login')} />
         )}
-
         {currentTab === 'account' && (
           <AccountView
             onOpenAuth={() => handleOpenAuth('login')}
@@ -102,13 +97,12 @@ function StoreApp() {
             onGotoOrders={() => handleTabChange('orders')}
           />
         )}
-
         {currentTab === 'admin' && (
           <AdminView onOpenAuth={() => handleOpenAuth('login')} />
         )}
       </main>
 
-      {/* Mobile Floating Bottom Bar */}
+      {/* Mobile Floating Bottom Navigation */}
       <MobileBottomNav
         currentTab={currentTab}
         setCurrentTab={handleTabChange}
@@ -136,7 +130,7 @@ function StoreApp() {
       />
 
       {/* Toast Notification Container */}
-      <Toast toasts={toasts} onDismiss={removeToast} />
+      <Toast />
     </div>
   );
 }
