@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useStore } from '../context/StoreContext';
 import { Eye, EyeOff, X, Lock, Mail, User as UserIcon, Loader2, ShieldCheck } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion } from 'motion/react';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -50,7 +50,6 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Au
     }
 
     setLoading(true);
-
     try {
       if (mode === 'register') {
         await register(email, password, name);
@@ -64,7 +63,6 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Au
       console.error('Auth error:', err);
       let userFriendlyMsg = 'Terjadi kesalahan. Silakan coba lagi.';
       const code = err?.code || '';
-
       if (code === 'auth/invalid-credential' || code === 'auth/wrong-password' || code === 'auth/user-not-found') {
         userFriendlyMsg = 'Email atau password yang Anda masukkan salah.';
       } else if (code === 'auth/email-already-in-use') {
@@ -74,11 +72,10 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Au
       } else if (code === 'auth/weak-password') {
         userFriendlyMsg = 'Password terlalu lemah (minimal 6 karakter).';
       } else if (code === 'auth/too-many-requests') {
-        userFriendlyMsg = 'Terlalu banyak percobaan gagal. Silakan tunggu beberapa saat.';
+        userFriendlyMsg = 'Terlalu banyak percobaan gagal. Silakan coba lagi nanti.';
       } else if (err?.message) {
         userFriendlyMsg = err.message;
       }
-
       setErrorMessage(userFriendlyMsg);
     } finally {
       setLoading(false);
@@ -91,10 +88,10 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Au
         initial={{ opacity: 0, scale: 0.95, y: 15 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 15 }}
-        className="relative w-full max-w-md bg-[#0a0a0f] border border-zinc-800/80 rounded-2xl p-6 sm:p-7 shadow-2xl text-white overflow-hidden"
+        className="relative w-full max-w-md bg-[#0e081e] border border-purple-500/40 rounded-3xl p-6 sm:p-7 shadow-2xl text-white overflow-hidden shadow-purple-900/40"
       >
         {/* Glow corner */}
-        <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-0 right-0 w-44 h-44 bg-purple-600/15 rounded-full blur-3xl pointer-events-none" />
 
         <button
           id="close-auth-modal-btn"
@@ -106,13 +103,13 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Au
 
         {/* Modal Header */}
         <div className="text-center mb-6">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-zinc-900 border border-zinc-700/60 mb-3 shadow-inner">
-            <ShieldCheck className="w-6 h-6 text-white" />
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-purple-950 border border-purple-500/40 mb-3 shadow-inner text-purple-300">
+            <ShieldCheck className="w-6 h-6" />
           </div>
-          <h2 className="text-xl font-bold tracking-tight text-white">
+          <h2 className="text-xl font-black tracking-tight text-white">
             {mode === 'login' ? 'Masuk ke Akun YANZSTR' : 'Daftar Akun Baru'}
           </h2>
-          <p className="text-xs text-zinc-400 mt-1">
+          <p className="text-xs text-zinc-300 mt-1">
             {mode === 'login'
               ? 'Kelola saldo, deposit, dan riwayat pesanan Anda'
               : 'Daftar sekarang untuk mulai membeli Alight Motion Premium'}
@@ -121,7 +118,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Au
 
         {/* Error Notification */}
         {errorMessage && (
-          <div className="mb-4 p-3 rounded-xl bg-rose-950/50 border border-rose-800/60 text-rose-300 text-xs flex items-center gap-2">
+          <div className="mb-4 p-3 rounded-2xl bg-rose-950/50 border border-rose-800/60 text-rose-300 text-xs flex items-center gap-2">
             <span>⚠️</span>
             <span>{errorMessage}</span>
           </div>
@@ -130,11 +127,11 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Au
         <form onSubmit={handleSubmit} className="space-y-4">
           {mode === 'register' && (
             <div>
-              <label className="block text-xs font-medium text-zinc-300 mb-1.5">
+              <label className="block text-xs font-bold text-purple-200 mb-1.5">
                 Nama Lengkap
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-500">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-purple-400">
                   <UserIcon className="w-4 h-4" />
                 </div>
                 <input
@@ -144,18 +141,18 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Au
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Contoh: Azril Yanz"
-                  className="w-full pl-10 pr-3.5 py-2.5 bg-zinc-900/90 border border-zinc-800 rounded-xl text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-white transition-colors"
+                  className="w-full pl-10 pr-3.5 py-2.5 bg-[#140b2a] border border-purple-500/30 rounded-xl text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-purple-400 transition-colors"
                 />
               </div>
             </div>
           )}
 
           <div>
-            <label className="block text-xs font-medium text-zinc-300 mb-1.5">
+            <label className="block text-xs font-bold text-purple-200 mb-1.5">
               Email
             </label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-500">
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-purple-400">
                 <Mail className="w-4 h-4" />
               </div>
               <input
@@ -165,17 +162,17 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Au
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="nama@email.com"
-                className="w-full pl-10 pr-3.5 py-2.5 bg-zinc-900/90 border border-zinc-800 rounded-xl text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-white transition-colors"
+                className="w-full pl-10 pr-3.5 py-2.5 bg-[#140b2a] border border-purple-500/30 rounded-xl text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-purple-400 transition-colors"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-zinc-300 mb-1.5">
+            <label className="block text-xs font-bold text-purple-200 mb-1.5">
               Password
             </label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-500">
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-purple-400">
                 <Lock className="w-4 h-4" />
               </div>
               <input
@@ -185,12 +182,12 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Au
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Minimal 6 karakter"
-                className="w-full pl-10 pr-10 py-2.5 bg-zinc-900/90 border border-zinc-800 rounded-xl text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-white transition-colors"
+                className="w-full pl-10 pr-10 py-2.5 bg-[#140b2a] border border-purple-500/30 rounded-xl text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-purple-400 transition-colors"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-zinc-400 hover:text-white"
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-purple-400 hover:text-white"
               >
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
@@ -199,11 +196,11 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Au
 
           {mode === 'register' && (
             <div>
-              <label className="block text-xs font-medium text-zinc-300 mb-1.5">
+              <label className="block text-xs font-bold text-purple-200 mb-1.5">
                 Konfirmasi Password
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-500">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-purple-400">
                   <Lock className="w-4 h-4" />
                 </div>
                 <input
@@ -213,7 +210,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Au
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Ulangi password Anda"
-                  className="w-full pl-10 pr-3.5 py-2.5 bg-zinc-900/90 border border-zinc-800 rounded-xl text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-white transition-colors"
+                  className="w-full pl-10 pr-3.5 py-2.5 bg-[#140b2a] border border-purple-500/30 rounded-xl text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-purple-400 transition-colors"
                 />
               </div>
             </div>
@@ -223,7 +220,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Au
             id="auth-submit-btn"
             type="submit"
             disabled={loading}
-            className="w-full mt-2 py-3 px-4 rounded-xl bg-white text-black hover:bg-zinc-200 font-semibold text-sm transition-all shadow-lg active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50"
+            className="w-full mt-2 py-3.5 px-4 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-black text-xs transition-all shadow-lg shadow-purple-600/30 active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50"
           >
             {loading ? (
               <>
@@ -233,13 +230,13 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Au
             ) : mode === 'login' ? (
               'Masuk Sekarang'
             ) : (
-              'Daftar Akun'
+              'Daftar Akun Baru'
             )}
           </button>
         </form>
 
         {/* Switch Mode Footer */}
-        <div className="mt-5 pt-4 border-t border-zinc-800/80 text-center text-xs text-zinc-400">
+        <div className="mt-5 pt-4 border-t border-purple-900/40 text-center text-xs text-zinc-400">
           {mode === 'login' ? (
             <p>
               Belum punya akun?{' '}
@@ -249,7 +246,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Au
                   setMode('register');
                   setErrorMessage('');
                 }}
-                className="font-semibold text-white hover:underline ml-1"
+                className="font-bold text-purple-300 hover:underline ml-1"
               >
                 Daftar sekarang
               </button>
@@ -263,7 +260,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Au
                   setMode('login');
                   setErrorMessage('');
                 }}
-                className="font-semibold text-white hover:underline ml-1"
+                className="font-bold text-purple-300 hover:underline ml-1"
               >
                 Masuk di sini
               </button>

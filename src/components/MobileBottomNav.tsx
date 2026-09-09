@@ -19,12 +19,11 @@ export default function MobileBottomNav({ currentTab, setCurrentTab, onOpenAuth 
   ];
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#07070a]/95 backdrop-blur-xl border-t border-zinc-800/80 px-2 py-1.5 shadow-2xl">
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#080512]/95 backdrop-blur-xl border-t border-purple-900/40 px-2 py-1.5 shadow-2xl">
       <div className="grid grid-cols-4 items-center justify-around">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = currentTab === tab.id;
-
           return (
             <button
               key={tab.id}
@@ -39,16 +38,16 @@ export default function MobileBottomNav({ currentTab, setCurrentTab, onOpenAuth 
               className={`flex flex-col items-center justify-center min-h-[46px] py-1 rounded-xl transition-all ${
                 isActive
                   ? 'text-white'
-                  : 'text-zinc-500 hover:text-zinc-300'
+                  : 'text-zinc-400 hover:text-purple-300'
               }`}
             >
               <div className="relative">
-                <Icon className={`w-5 h-5 transition-transform ${isActive ? 'scale-110' : ''}`} />
+                <Icon className={`w-5 h-5 transition-transform ${isActive ? 'scale-110 text-purple-400' : ''}`} />
                 {isActive && (
-                  <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-white rounded-full" />
+                  <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-purple-400 rounded-full shadow-sm shadow-purple-400" />
                 )}
               </div>
-              <span className={`text-[11px] mt-1 font-medium tracking-tight ${isActive ? 'font-semibold text-white' : ''}`}>
+              <span className={`text-[11px] mt-1 font-medium tracking-tight ${isActive ? 'font-bold text-white' : ''}`}>
                 {tab.label}
               </span>
             </button>

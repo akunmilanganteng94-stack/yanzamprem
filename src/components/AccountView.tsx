@@ -12,10 +12,7 @@ import {
   Edit2,
   LogOut,
   Shield,
-  History,
-  Check,
-  AlertCircle,
-  Loader2
+  History
 } from 'lucide-react';
 
 export default function AccountView({
@@ -41,19 +38,19 @@ export default function AccountView({
   if (!currentUser || !userProfile) {
     return (
       <div className="max-w-md mx-auto py-16 px-4 text-center">
-        <div className="w-16 h-16 rounded-2xl bg-zinc-900 border border-zinc-800 mx-auto flex items-center justify-center text-zinc-400 mb-4">
+        <div className="w-16 h-16 rounded-2xl bg-[#140b2a] border border-purple-500/30 mx-auto flex items-center justify-center text-purple-400 mb-4 shadow-lg shadow-purple-950/50">
           <User className="w-8 h-8" />
         </div>
-        <h2 className="text-xl font-bold text-white mb-2">Profil Pengguna</h2>
-        <p className="text-xs text-zinc-400 mb-6 max-w-xs mx-auto">
-          Masuk ke akun Anda untuk melihat saldo, riwayat transaksi, dan pengaturan keamanan.
+        <h2 className="text-xl font-black text-white mb-2">Profil Pengguna</h2>
+        <p className="text-xs text-zinc-300 mb-6 max-w-xs mx-auto">
+          Masuk ke akun Anda untuk melihat saldo, riwayat transaksi, dan pengaturan keamanan akun.
         </p>
         <button
           id="account-login-btn"
           onClick={onOpenAuth}
-          className="py-2.5 px-6 rounded-xl bg-white text-black font-bold text-xs tracking-wide hover:bg-zinc-200 transition-all shadow-lg"
+          className="py-3 px-6 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs tracking-wide transition-all shadow-lg shadow-purple-600/30"
         >
-          Masuk / Daftar
+          Masuk / Daftar Sekarang
         </button>
       </div>
     );
@@ -113,19 +110,19 @@ export default function AccountView({
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
       {/* Profile Overview Card */}
-      <div className="bg-[#0d0d12] border border-zinc-800 rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+      <div className="bg-[#0e081e] border border-purple-500/30 rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
         {/* Glow */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-purple-600/10 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-6 border-b border-zinc-800/80">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-6 border-b border-purple-900/40">
           <div className="flex items-center gap-4">
             {/* Avatar */}
-            <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-tr from-zinc-800 to-zinc-700 border border-zinc-600/50 flex items-center justify-center text-white font-extrabold text-2xl sm:text-3xl shadow-xl">
+            <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-tr from-purple-900 to-violet-700 border-2 border-purple-400/60 flex items-center justify-center text-white font-black text-2xl sm:text-3xl shadow-xl shadow-purple-950/60">
               {userProfile.name.charAt(0).toUpperCase()}
               {isAdmin && (
                 <div
-                  className="absolute -bottom-1 -right-1 bg-amber-400 text-black p-1 rounded-lg shadow"
-                  title="Admin Store"
+                  className="absolute -bottom-1 -right-1 bg-purple-500 text-white p-1 rounded-lg shadow-md"
+                  title="Admin Toko"
                 >
                   <Shield className="w-3.5 h-3.5 fill-current" />
                 </div>
@@ -138,21 +135,21 @@ export default function AccountView({
                   {userProfile.name}
                 </h2>
                 <span
-                  className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                  className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
                     userProfile.status === 'suspended'
-                      ? 'bg-rose-950/80 border border-rose-800 text-rose-300'
-                      : 'bg-emerald-950/80 border border-emerald-500/40 text-emerald-300'
+                      ? 'bg-rose-950/80 border-rose-800 text-rose-300'
+                      : 'bg-purple-950/80 border-purple-500/50 text-purple-300'
                   }`}
                 >
                   {userProfile.status}
                 </span>
               </div>
-              <p className="text-xs text-zinc-400 flex items-center gap-1.5 mt-0.5">
-                <Mail className="w-3.5 h-3.5 text-zinc-500" />
+              <p className="text-xs text-zinc-300 flex items-center gap-1.5 mt-0.5">
+                <Mail className="w-3.5 h-3.5 text-purple-400" />
                 <span>{userProfile.email}</span>
               </p>
-              <p className="text-[11px] text-zinc-500 flex items-center gap-1.5 mt-1">
-                <Calendar className="w-3.5 h-3.5 text-zinc-600" />
+              <p className="text-[11px] text-zinc-400 flex items-center gap-1.5 mt-1">
+                <Calendar className="w-3.5 h-3.5 text-purple-400" />
                 <span>Bergabung sejak {formatDate(userProfile.createdAt)}</span>
               </p>
             </div>
@@ -165,7 +162,7 @@ export default function AccountView({
                 setNewName(userProfile.name);
                 setIsEditingName(!isEditingName);
               }}
-              className="py-2 px-4 rounded-xl border border-zinc-800 hover:border-zinc-700 bg-zinc-900 text-xs font-semibold text-zinc-300 hover:text-white transition-all flex items-center gap-2"
+              className="py-2 px-4 rounded-xl border border-purple-500/30 hover:border-purple-400 bg-[#140b2a] text-xs font-bold text-purple-200 hover:text-white transition-all flex items-center gap-2"
             >
               <Edit2 className="w-3.5 h-3.5" />
               <span>{isEditingName ? 'Tutup Edit' : 'Edit Profil'}</span>
@@ -174,7 +171,7 @@ export default function AccountView({
             <button
               id="change-pass-trigger-btn"
               onClick={() => setIsChangingPass(!isChangingPass)}
-              className="py-2 px-4 rounded-xl border border-zinc-800 hover:border-zinc-700 bg-zinc-900 text-xs font-semibold text-zinc-300 hover:text-white transition-all flex items-center gap-2"
+              className="py-2 px-4 rounded-xl border border-purple-500/30 hover:border-purple-400 bg-[#140b2a] text-xs font-bold text-purple-200 hover:text-white transition-all flex items-center gap-2"
             >
               <Lock className="w-3.5 h-3.5" />
               <span>{isChangingPass ? 'Tutup Password' : 'Ganti Password'}</span>
@@ -183,7 +180,7 @@ export default function AccountView({
             <button
               id="account-logout-btn"
               onClick={logout}
-              className="py-2 px-4 rounded-xl border border-rose-900/40 hover:bg-rose-950/30 text-xs font-semibold text-rose-400 transition-all flex items-center gap-2"
+              className="py-2 px-4 rounded-xl border border-rose-900/40 hover:bg-rose-950/40 text-xs font-bold text-rose-400 transition-all flex items-center gap-2"
             >
               <LogOut className="w-3.5 h-3.5" />
               <span>Logout</span>
@@ -193,8 +190,8 @@ export default function AccountView({
 
         {/* Edit Name Inline Form */}
         {isEditingName && (
-          <form onSubmit={handleSaveName} className="py-4 border-b border-zinc-800 max-w-md space-y-3">
-            <h4 className="text-xs font-bold text-white">Ubah Nama Profil</h4>
+          <form onSubmit={handleSaveName} className="py-4 border-b border-purple-900/40 max-w-md space-y-3">
+            <h4 className="text-xs font-bold text-purple-200">Ubah Nama Profil</h4>
             <div className="flex gap-2">
               <input
                 id="edit-name-input"
@@ -203,13 +200,13 @@ export default function AccountView({
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
                 placeholder="Nama Anda"
-                className="flex-1 px-3.5 py-2 bg-zinc-900 border border-zinc-800 rounded-xl text-xs text-white focus:outline-none focus:border-white"
+                className="flex-1 px-3.5 py-2 bg-[#140b2a] border border-purple-500/40 rounded-xl text-xs text-white focus:outline-none focus:border-purple-400"
               />
               <button
                 id="save-name-btn"
                 type="submit"
                 disabled={loading}
-                className="px-4 py-2 bg-white text-black font-bold text-xs rounded-xl hover:bg-zinc-200 transition-colors"
+                className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs rounded-xl transition-colors"
               >
                 Simpan
               </button>
@@ -219,8 +216,8 @@ export default function AccountView({
 
         {/* Change Password Inline Form */}
         {isChangingPass && (
-          <form onSubmit={handleChangePassword} className="py-4 border-b border-zinc-800 max-w-md space-y-3">
-            <h4 className="text-xs font-bold text-white">Ganti Password Akun</h4>
+          <form onSubmit={handleChangePassword} className="py-4 border-b border-purple-900/40 max-w-md space-y-3">
+            <h4 className="text-xs font-bold text-purple-200">Ganti Password Akun</h4>
             {errorMsg && (
               <p className="text-xs text-rose-400">{errorMsg}</p>
             )}
@@ -231,7 +228,7 @@ export default function AccountView({
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               placeholder="Password baru (min. 6 karakter)"
-              className="w-full px-3.5 py-2 bg-zinc-900 border border-zinc-800 rounded-xl text-xs text-white focus:outline-none focus:border-white"
+              className="w-full px-3.5 py-2 bg-[#140b2a] border border-purple-500/40 rounded-xl text-xs text-white focus:outline-none focus:border-purple-400"
             />
             <input
               id="confirm-change-pass-input"
@@ -240,13 +237,13 @@ export default function AccountView({
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               placeholder="Ulangi password baru"
-              className="w-full px-3.5 py-2 bg-zinc-900 border border-zinc-800 rounded-xl text-xs text-white focus:outline-none focus:border-white"
+              className="w-full px-3.5 py-2 bg-[#140b2a] border border-purple-500/40 rounded-xl text-xs text-white focus:outline-none focus:border-purple-400"
             />
             <button
               id="save-new-pass-btn"
               type="submit"
               disabled={loading}
-              className="px-4 py-2 bg-white text-black font-bold text-xs rounded-xl hover:bg-zinc-200 transition-colors"
+              className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs rounded-xl transition-colors"
             >
               Update Password
             </button>
@@ -255,54 +252,51 @@ export default function AccountView({
 
         {/* Metrics Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6">
-          {/* Metric 1: Saldo */}
-          <div className="bg-zinc-900/80 border border-zinc-800/90 rounded-2xl p-4 flex items-center justify-between">
+          <div className="bg-[#140b2a] border border-purple-500/30 rounded-2xl p-4 flex items-center justify-between shadow-sm">
             <div className="space-y-1">
-              <span className="text-[11px] text-zinc-400 font-medium">Saldo Dompet</span>
+              <span className="text-[11px] text-purple-300 font-bold">Saldo Dompet</span>
               <p className="text-xl font-black text-white">
                 Rp{(userProfile.balance || 0).toLocaleString('id-ID')}
               </p>
               <button
                 id="metric-deposit-btn"
                 onClick={onGotoDeposit}
-                className="text-[11px] font-semibold text-emerald-400 hover:underline inline-block pt-1"
+                className="text-[11px] font-bold text-purple-400 hover:text-purple-300 hover:underline inline-block pt-1"
               >
                 + Top Up / Deposit
               </button>
             </div>
-            <div className="w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-300">
+            <div className="w-10 h-10 rounded-xl bg-purple-950 border border-purple-500/40 flex items-center justify-center text-purple-300">
               <Wallet className="w-5 h-5" />
             </div>
           </div>
 
-          {/* Metric 2: Orders */}
-          <div className="bg-zinc-900/80 border border-zinc-800/90 rounded-2xl p-4 flex items-center justify-between">
+          <div className="bg-[#140b2a] border border-purple-500/30 rounded-2xl p-4 flex items-center justify-between shadow-sm">
             <div className="space-y-1">
-              <span className="text-[11px] text-zinc-400 font-medium">Total Pesanan</span>
+              <span className="text-[11px] text-purple-300 font-bold">Total Pesanan</span>
               <p className="text-xl font-black text-white">{orders.length}</p>
               <button
                 id="metric-orders-btn"
                 onClick={onGotoOrders}
-                className="text-[11px] font-semibold text-zinc-300 hover:underline inline-block pt-1"
+                className="text-[11px] font-bold text-purple-300 hover:text-white hover:underline inline-block pt-1"
               >
-                Lihat Riwayat →
+                Lihat Riwayat
               </button>
             </div>
-            <div className="w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-300">
+            <div className="w-10 h-10 rounded-xl bg-purple-950 border border-purple-500/40 flex items-center justify-center text-purple-300">
               <ShoppingBag className="w-5 h-5" />
             </div>
           </div>
 
-          {/* Metric 3: Deposits */}
-          <div className="bg-zinc-900/80 border border-zinc-800/90 rounded-2xl p-4 flex items-center justify-between">
+          <div className="bg-[#140b2a] border border-purple-500/30 rounded-2xl p-4 flex items-center justify-between shadow-sm">
             <div className="space-y-1">
-              <span className="text-[11px] text-zinc-400 font-medium">Total Deposit</span>
+              <span className="text-[11px] text-purple-300 font-bold">Total Deposit</span>
               <p className="text-xl font-black text-white">{deposits.length}</p>
-              <span className="text-[11px] text-zinc-500 inline-block pt-1">
-                {deposits.filter((d) => d.status === 'APPROVED').length} Sukses
+              <span className="text-[11px] text-purple-400 inline-block pt-1">
+                {deposits.filter((d) => d.status === 'APPROVED').length} Berhasil
               </span>
             </div>
-            <div className="w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-300">
+            <div className="w-10 h-10 rounded-xl bg-purple-950 border border-purple-500/40 flex items-center justify-center text-purple-300">
               <ArrowDownCircle className="w-5 h-5" />
             </div>
           </div>
@@ -310,40 +304,40 @@ export default function AccountView({
       </div>
 
       {/* Mutasi Saldo & Log Transaksi */}
-      <div className="bg-[#0d0d12] border border-zinc-800 rounded-3xl p-6 sm:p-8 shadow-xl">
+      <div className="bg-[#0e081e] border border-purple-500/30 rounded-3xl p-6 sm:p-8 shadow-xl">
         <div className="flex items-center justify-between mb-5">
           <div className="flex items-center gap-2.5">
-            <History className="w-5 h-5 text-zinc-400" />
-            <h3 className="text-lg font-bold text-white tracking-tight">Mutasi & Riwayat Transaksi Saldo</h3>
+            <History className="w-5 h-5 text-purple-400" />
+            <h3 className="text-lg font-black text-white tracking-tight">Mutasi & Riwayat Transaksi Saldo</h3>
           </div>
-          <span className="text-xs text-zinc-500">Realtime dari Firestore</span>
+          <span className="text-xs text-purple-400 font-medium">Realtime Database</span>
         </div>
 
         {transactions.length === 0 ? (
-          <div className="py-10 text-center border border-dashed border-zinc-800 rounded-2xl">
-            <p className="text-xs text-zinc-500">Belum ada catatan transaksi saldo.</p>
+          <div className="py-10 text-center border border-dashed border-purple-900/40 rounded-2xl">
+            <p className="text-xs text-zinc-400">Belum ada catatan mutasi saldo.</p>
           </div>
         ) : (
-          <div className="divide-y divide-zinc-900">
+          <div className="divide-y divide-[#170e30]">
             {transactions.map((tx) => {
               const isPositive = tx.amount > 0;
               return (
                 <div key={tx.id} className="py-3.5 flex items-center justify-between gap-3 text-xs">
                   <div className="space-y-0.5">
-                    <p className="font-semibold text-zinc-200">{tx.description}</p>
-                    <p className="text-[10px] text-zinc-500">
+                    <p className="font-bold text-white">{tx.description}</p>
+                    <p className="text-[10px] text-zinc-400">
                       {formatDate(tx.createdAt)} • Saldo: Rp{tx.balanceBefore?.toLocaleString('id-ID')} → Rp{tx.balanceAfter?.toLocaleString('id-ID')}
                     </p>
                   </div>
                   <div className="text-right">
                     <span
-                      className={`font-mono font-bold text-sm ${
-                        isPositive ? 'text-emerald-400' : 'text-rose-400'
+                      className={`font-mono font-black text-sm ${
+                        isPositive ? 'text-purple-300' : 'text-rose-400'
                       }`}
                     >
                       {isPositive ? '+' : ''}Rp{tx.amount.toLocaleString('id-ID')}
                     </span>
-                    <span className="block text-[10px] font-semibold text-zinc-500 uppercase tracking-wider">
+                    <span className="block text-[10px] font-bold text-purple-400/80 uppercase tracking-wider">
                       {tx.type}
                     </span>
                   </div>

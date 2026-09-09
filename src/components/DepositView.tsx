@@ -9,18 +9,15 @@ import {
   ArrowRight,
   Clock,
   CheckCircle2,
-  XCircle,
   AlertCircle,
   QrCode,
   Smartphone,
-  Loader2,
-  RefreshCw
+  Loader2
 } from 'lucide-react';
 import QRISZoomModal from './QRISZoomModal';
 
 const QRIS_IMAGE_URL = 'https://cdn.phototourl.com/free/2026-09-09-c2bc2515-a9d0-4b09-8137-3f3fed5407e4.jpg';
 const DANA_NUMBER = '081316779475';
-
 const QUICK_AMOUNTS = [1000, 2000, 5000, 10000, 20000, 50000];
 
 export default function DepositView({ onOpenAuth }: { onOpenAuth: () => void }) {
@@ -40,19 +37,19 @@ export default function DepositView({ onOpenAuth }: { onOpenAuth: () => void }) 
   if (!currentUser) {
     return (
       <div className="max-w-md mx-auto py-16 px-4 text-center">
-        <div className="w-16 h-16 rounded-2xl bg-zinc-900 border border-zinc-800 mx-auto flex items-center justify-center text-zinc-400 mb-4">
+        <div className="w-16 h-16 rounded-2xl bg-[#140b2a] border border-purple-500/30 mx-auto flex items-center justify-center text-purple-400 mb-4 shadow-lg shadow-purple-950/50">
           <Wallet className="w-8 h-8" />
         </div>
-        <h2 className="text-xl font-bold text-white mb-2">Deposit Saldo YANZSTR</h2>
-        <p className="text-xs text-zinc-400 mb-6 max-w-xs mx-auto">
-          Silakan masuk atau daftar terlebih dahulu untuk melakukan pengisian saldo.
+        <h2 className="text-xl font-black text-white mb-2">Deposit Saldo YANZSTR</h2>
+        <p className="text-xs text-zinc-300 mb-6 max-w-xs mx-auto">
+          Silakan masuk atau daftar terlebih dahulu untuk melakukan pengisian saldo digital Anda.
         </p>
         <button
           id="deposit-login-btn"
           onClick={onOpenAuth}
-          className="py-2.5 px-6 rounded-xl bg-white text-black font-bold text-xs tracking-wide hover:bg-zinc-200 transition-all shadow-lg"
+          className="py-3 px-6 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs tracking-wide transition-all shadow-lg shadow-purple-600/30"
         >
-          Masuk / Daftar
+          Masuk / Daftar Sekarang
         </button>
       </div>
     );
@@ -132,26 +129,25 @@ export default function DepositView({ onOpenAuth }: { onOpenAuth: () => void }) 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
       {/* Deposit Form Card */}
-      <div className="bg-[#0c0c12] border border-zinc-800 rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-zinc-800/80">
+      <div className="bg-[#0e081e] border border-purple-500/30 rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-purple-900/40">
           <div>
-            <span className="text-[11px] font-bold uppercase tracking-widest text-zinc-400">
+            <span className="text-[11px] font-bold uppercase tracking-widest text-purple-400">
               Formulir Isi Saldo
             </span>
             <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight mt-0.5">
               Deposit Saldo YANZSTR
             </h2>
-            <p className="text-xs text-zinc-400 mt-1">
-              Minimal deposit Rp1.000. Proses verifikasi admin cepat dan aman.
+            <p className="text-xs text-zinc-300 mt-1">
+              Minimal deposit Rp1.000. Proses verifikasi admin cepat dan saldo langsung aktif.
             </p>
           </div>
-
-          <div className="flex items-center gap-3 bg-zinc-900/80 border border-zinc-800 rounded-2xl p-3 px-4 shrink-0">
-            <div className="w-8 h-8 rounded-xl bg-zinc-800 flex items-center justify-center text-emerald-400">
+          <div className="flex items-center gap-3 bg-[#160c2f] border border-purple-500/30 rounded-2xl p-3 px-4 shrink-0 shadow-sm shadow-purple-950/40">
+            <div className="w-8 h-8 rounded-xl bg-purple-950 border border-purple-500/40 flex items-center justify-center text-purple-300">
               <Wallet className="w-4 h-4" />
             </div>
             <div>
-              <p className="text-[10px] text-zinc-400">Saldo Saat Ini</p>
+              <p className="text-[10px] text-purple-300">Saldo Dompet Saat Ini</p>
               <p className="text-sm font-black text-white">
                 Rp{(userProfile?.balance || 0).toLocaleString('id-ID')}
               </p>
@@ -164,38 +160,38 @@ export default function DepositView({ onOpenAuth }: { onOpenAuth: () => void }) 
           <div className="flex items-center gap-2">
             <span
               className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${
-                step >= 1 ? 'bg-white text-black' : 'bg-zinc-800 text-zinc-400'
+                step >= 1 ? 'bg-purple-600 text-white' : 'bg-zinc-800 text-zinc-400'
               }`}
             >
               1
             </span>
-            <span className={`text-xs ${step >= 1 ? 'text-white font-medium' : 'text-zinc-500'}`}>
+            <span className={`text-xs ${step >= 1 ? 'text-white font-bold' : 'text-zinc-500'}`}>
               Nominal
             </span>
           </div>
-          <div className={`h-0.5 flex-1 mx-2 ${step >= 2 ? 'bg-white' : 'bg-zinc-800'}`} />
+          <div className={`h-0.5 flex-1 mx-2 ${step >= 2 ? 'bg-purple-600' : 'bg-zinc-800'}`} />
           <div className="flex items-center gap-2">
             <span
               className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${
-                step >= 2 ? 'bg-white text-black' : 'bg-zinc-800 text-zinc-400'
+                step >= 2 ? 'bg-purple-600 text-white' : 'bg-zinc-800 text-zinc-400'
               }`}
             >
               2
             </span>
-            <span className={`text-xs ${step >= 2 ? 'text-white font-medium' : 'text-zinc-500'}`}>
-              Nama Pengirim
+            <span className={`text-xs ${step >= 2 ? 'text-white font-bold' : 'text-zinc-500'}`}>
+              Pengirim
             </span>
           </div>
-          <div className={`h-0.5 flex-1 mx-2 ${step >= 3 ? 'bg-white' : 'bg-zinc-800'}`} />
+          <div className={`h-0.5 flex-1 mx-2 ${step >= 3 ? 'bg-purple-600' : 'bg-zinc-800'}`} />
           <div className="flex items-center gap-2">
             <span
               className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${
-                step >= 3 ? 'bg-white text-black' : 'bg-zinc-800 text-zinc-400'
+                step >= 3 ? 'bg-purple-600 text-white' : 'bg-zinc-800 text-zinc-400'
               }`}
             >
               3
             </span>
-            <span className={`text-xs ${step >= 3 ? 'text-white font-medium' : 'text-zinc-500'}`}>
+            <span className={`text-xs ${step >= 3 ? 'text-white font-bold' : 'text-zinc-500'}`}>
               Pembayaran
             </span>
           </div>
@@ -212,7 +208,7 @@ export default function DepositView({ onOpenAuth }: { onOpenAuth: () => void }) 
         {step === 1 && (
           <div className="space-y-6">
             <div>
-              <label className="block text-xs font-semibold text-zinc-300 mb-2">
+              <label className="block text-xs font-bold text-purple-200 mb-2">
                 Pilih Nominal Cepat (IDR):
               </label>
               <div className="grid grid-cols-3 sm:grid-cols-6 gap-2.5">
@@ -224,8 +220,8 @@ export default function DepositView({ onOpenAuth }: { onOpenAuth: () => void }) 
                     onClick={() => handleSelectAmount(val)}
                     className={`py-2.5 px-3 rounded-xl text-xs font-bold transition-all border ${
                       amount === val
-                        ? 'bg-white text-black border-white shadow-lg'
-                        : 'bg-zinc-900/80 text-zinc-300 border-zinc-800 hover:border-zinc-600'
+                        ? 'bg-purple-600 text-white border-purple-400 shadow-lg shadow-purple-600/30'
+                        : 'bg-[#140b2a] text-zinc-300 border-purple-900/40 hover:border-purple-500/50'
                     }`}
                   >
                     Rp{val.toLocaleString('id-ID')}
@@ -235,11 +231,11 @@ export default function DepositView({ onOpenAuth }: { onOpenAuth: () => void }) 
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-zinc-300 mb-2">
+              <label className="block text-xs font-bold text-purple-200 mb-2">
                 Atau Masukkan Nominal Sendiri:
               </label>
               <div className="relative max-w-sm">
-                <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-500 font-bold text-sm">
+                <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-purple-400 font-bold text-sm">
                   Rp
                 </span>
                 <input
@@ -248,10 +244,10 @@ export default function DepositView({ onOpenAuth }: { onOpenAuth: () => void }) 
                   value={customAmount}
                   onChange={(e) => handleCustomChange(e.target.value)}
                   placeholder="5000"
-                  className="w-full pl-11 pr-4 py-3 bg-zinc-900 border border-zinc-800 rounded-xl text-white font-bold text-sm focus:outline-none focus:border-white transition-colors"
+                  className="w-full pl-11 pr-4 py-3 bg-[#140b2a] border border-purple-500/30 rounded-xl text-white font-black text-sm focus:outline-none focus:border-purple-400 transition-colors"
                 />
               </div>
-              <p className="text-[11px] text-zinc-500 mt-1.5">
+              <p className="text-[11px] text-zinc-400 mt-1.5">
                 Minimal deposit: Rp1.000
               </p>
             </div>
@@ -261,7 +257,7 @@ export default function DepositView({ onOpenAuth }: { onOpenAuth: () => void }) 
                 id="deposit-step1-next-btn"
                 type="button"
                 onClick={handleNextStep}
-                className="py-3 px-6 rounded-xl bg-white text-black font-bold text-xs hover:bg-zinc-200 transition-all flex items-center gap-2"
+                className="py-3 px-6 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs transition-all flex items-center gap-2 shadow-lg shadow-purple-600/30"
               >
                 <span>Lanjut: Masukkan Pengirim</span>
                 <ArrowRight className="w-4 h-4" />
@@ -274,7 +270,7 @@ export default function DepositView({ onOpenAuth }: { onOpenAuth: () => void }) 
         {step === 2 && (
           <div className="space-y-6 max-w-md">
             <div>
-              <label className="block text-xs font-semibold text-zinc-300 mb-1.5">
+              <label className="block text-xs font-bold text-purple-200 mb-1.5">
                 Nama Pemilik Rekening / Akun E-Wallet Pengirim:
               </label>
               <input
@@ -283,11 +279,11 @@ export default function DepositView({ onOpenAuth }: { onOpenAuth: () => void }) 
                 required
                 value={senderName}
                 onChange={(e) => setSenderName(e.target.value)}
-                placeholder="Contoh: Azril / Yanz Pratama"
-                className="w-full px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-xl text-white text-sm focus:outline-none focus:border-white transition-colors"
+                placeholder="Contoh: Azril / Pratama"
+                className="w-full px-4 py-3 bg-[#140b2a] border border-purple-500/30 rounded-xl text-white text-sm focus:outline-none focus:border-purple-400 transition-colors"
               />
-              <p className="text-[11px] text-zinc-500 mt-1.5">
-                Pastikan nama sesuai dengan yang tertera di bukti transfer bank/e-wallet Anda.
+              <p className="text-[11px] text-zinc-400 mt-1.5 leading-relaxed">
+                Pastikan nama sesuai dengan yang tertera di bukti transfer bank atau e-wallet Anda.
               </p>
             </div>
 
@@ -296,7 +292,7 @@ export default function DepositView({ onOpenAuth }: { onOpenAuth: () => void }) 
                 id="deposit-step2-back-btn"
                 type="button"
                 onClick={() => setStep(1)}
-                className="py-3 px-5 rounded-xl border border-zinc-800 text-zinc-400 hover:text-white text-xs font-semibold transition-colors"
+                className="py-3 px-5 rounded-xl border border-zinc-700 text-zinc-300 hover:text-white text-xs font-semibold transition-colors"
               >
                 Kembali
               </button>
@@ -304,7 +300,7 @@ export default function DepositView({ onOpenAuth }: { onOpenAuth: () => void }) 
                 id="deposit-step2-next-btn"
                 type="button"
                 onClick={handleNextStep}
-                className="flex-1 py-3 px-6 rounded-xl bg-white text-black font-bold text-xs hover:bg-zinc-200 transition-all flex items-center justify-center gap-2"
+                className="flex-1 py-3 px-6 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs transition-all flex items-center justify-center gap-2 shadow-lg shadow-purple-600/30"
               >
                 <span>Lanjut: Pembayaran</span>
                 <ArrowRight className="w-4 h-4" />
@@ -316,22 +312,22 @@ export default function DepositView({ onOpenAuth }: { onOpenAuth: () => void }) 
         {/* STEP 3: PILIH PEMBAYARAN & TRANSFER */}
         {step === 3 && (
           <div className="space-y-6">
-            <div className="p-4 rounded-2xl bg-zinc-900/60 border border-zinc-800 text-xs flex flex-wrap items-center justify-between gap-2">
+            <div className="p-4 rounded-2xl bg-[#140b2a] border border-purple-500/30 text-xs flex flex-wrap items-center justify-between gap-2">
               <div>
-                <span className="text-zinc-400">Total Transfer: </span>
-                <span className="font-black text-white text-sm">
+                <span className="text-zinc-300">Total Nominal: </span>
+                <span className="font-black text-white text-base">
                   Rp{amount.toLocaleString('id-ID')}
                 </span>
               </div>
               <div>
-                <span className="text-zinc-400">Pengirim: </span>
-                <span className="font-semibold text-white">{senderName}</span>
+                <span className="text-zinc-300">Pengirim: </span>
+                <span className="font-bold text-purple-300">{senderName}</span>
               </div>
             </div>
 
             {/* Payment Method Selector */}
             <div>
-              <label className="block text-xs font-semibold text-zinc-300 mb-2">
+              <label className="block text-xs font-bold text-purple-200 mb-2">
                 Pilih Metode Pembayaran:
               </label>
               <div className="grid grid-cols-2 gap-3 max-w-md">
@@ -341,14 +337,14 @@ export default function DepositView({ onOpenAuth }: { onOpenAuth: () => void }) 
                   onClick={() => setPaymentMethod('QRIS')}
                   className={`flex items-center gap-3 p-3.5 rounded-xl border text-left transition-all ${
                     paymentMethod === 'QRIS'
-                      ? 'bg-zinc-800 border-white text-white shadow-md'
-                      : 'bg-zinc-900/60 border-zinc-800 text-zinc-400 hover:border-zinc-700'
+                      ? 'bg-purple-600 text-white border-purple-400 shadow-md shadow-purple-600/30'
+                      : 'bg-[#140b2a] border-purple-900/40 text-zinc-300 hover:border-purple-500/50'
                   }`}
                 >
-                  <QrCode className="w-5 h-5 text-emerald-400" />
+                  <QrCode className="w-5 h-5 text-white" />
                   <div>
-                    <p className="text-xs font-bold text-white leading-tight">QRIS All Payment</p>
-                    <p className="text-[10px] text-zinc-400">BCA, Gopay, OVO, ShopeePay</p>
+                    <p className="text-xs font-black leading-tight">QRIS All Payment</p>
+                    <p className="text-[10px] opacity-80">BCA, Gopay, OVO, ShopeePay</p>
                   </div>
                 </button>
 
@@ -358,14 +354,14 @@ export default function DepositView({ onOpenAuth }: { onOpenAuth: () => void }) 
                   onClick={() => setPaymentMethod('DANA')}
                   className={`flex items-center gap-3 p-3.5 rounded-xl border text-left transition-all ${
                     paymentMethod === 'DANA'
-                      ? 'bg-zinc-800 border-white text-white shadow-md'
-                      : 'bg-zinc-900/60 border-zinc-800 text-zinc-400 hover:border-zinc-700'
+                      ? 'bg-purple-600 text-white border-purple-400 shadow-md shadow-purple-600/30'
+                      : 'bg-[#140b2a] border-purple-900/40 text-zinc-300 hover:border-purple-500/50'
                   }`}
                 >
-                  <Smartphone className="w-5 h-5 text-sky-400" />
+                  <Smartphone className="w-5 h-5 text-white" />
                   <div>
-                    <p className="text-xs font-bold text-white leading-tight">DANA</p>
-                    <p className="text-[10px] text-zinc-400">Transfer Saldo DANA</p>
+                    <p className="text-xs font-black leading-tight">DANA</p>
+                    <p className="text-[10px] opacity-80">Transfer Sesama DANA</p>
                   </div>
                 </button>
               </div>
@@ -373,23 +369,23 @@ export default function DepositView({ onOpenAuth }: { onOpenAuth: () => void }) 
 
             {/* Instruction Area */}
             {paymentMethod === 'QRIS' ? (
-              <div className="bg-zinc-950 border border-zinc-800/90 rounded-2xl p-5 max-w-sm mx-auto text-center space-y-3">
-                <p className="text-xs font-bold text-zinc-200">
+              <div className="bg-[#110822] border border-purple-500/30 rounded-2xl p-5 max-w-sm mx-auto text-center space-y-3 shadow-inner">
+                <p className="text-xs font-bold text-purple-200">
                   Scan QRIS di bawah ini dengan nominal pas:
                 </p>
                 <div
                   id="qris-click-zoom-container"
                   onClick={() => setIsZoomOpen(true)}
-                  className="relative group cursor-pointer w-52 h-52 mx-auto bg-white p-3 rounded-xl shadow-lg flex items-center justify-center overflow-hidden"
+                  className="relative group cursor-pointer w-52 h-52 mx-auto bg-white p-3 rounded-2xl shadow-lg flex items-center justify-center overflow-hidden border border-purple-500/30"
                   title="Klik untuk memperbesar QRIS"
                 >
                   <img
                     src={QRIS_IMAGE_URL}
                     alt="QRIS YANZSTR"
-                    className="w-full h-full object-contain rounded"
+                    className="w-full h-full object-contain rounded-lg"
                     referrerPolicy="no-referrer"
                   />
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-semibold gap-1.5 backdrop-blur-[1px]">
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-bold gap-1.5 backdrop-blur-[1px]">
                     <ZoomIn className="w-4 h-4" />
                     <span>Perbesar</span>
                   </div>
@@ -398,32 +394,32 @@ export default function DepositView({ onOpenAuth }: { onOpenAuth: () => void }) 
                   id="qris-zoom-trigger-btn"
                   type="button"
                   onClick={() => setIsZoomOpen(true)}
-                  className="text-xs text-emerald-400 hover:underline inline-flex items-center gap-1"
+                  className="text-xs text-purple-400 hover:text-purple-300 underline inline-flex items-center gap-1 font-semibold"
                 >
                   <ZoomIn className="w-3.5 h-3.5" />
                   <span>Klik untuk Zoom QRIS</span>
                 </button>
               </div>
             ) : (
-              <div className="bg-zinc-950 border border-zinc-800/90 rounded-2xl p-5 max-w-sm mx-auto space-y-4">
-                <div className="text-center">
-                  <p className="text-xs text-zinc-400">Nomor Akun DANA YANZSTR:</p>
-                  <p className="text-xl font-mono font-black text-white tracking-widest mt-1">
+              <div className="bg-[#110822] border border-purple-500/30 rounded-2xl p-5 max-w-sm mx-auto space-y-4 shadow-inner text-center">
+                <div>
+                  <p className="text-xs text-purple-300">Nomor Akun DANA YANZSTR:</p>
+                  <p className="text-2xl font-mono font-black text-white tracking-widest mt-1">
                     {DANA_NUMBER}
                   </p>
-                  <p className="text-[11px] text-zinc-500 mt-0.5">a.n. YANZSTR DIGITAL</p>
+                  <p className="text-[11px] text-zinc-400 mt-0.5">a.n. YANZSTR DIGITAL</p>
                 </div>
 
                 <button
                   id="copy-dana-number-btn"
                   type="button"
                   onClick={handleCopyDana}
-                  className="w-full py-2.5 px-4 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-xs font-semibold text-white transition-all flex items-center justify-center gap-2"
+                  className="w-full py-2.5 px-4 rounded-xl bg-purple-950 hover:bg-purple-900 border border-purple-500/40 text-xs font-bold text-white transition-all flex items-center justify-center gap-2 shadow-sm"
                 >
                   {copiedDana ? (
                     <>
-                      <Check className="w-4 h-4 text-emerald-400" />
-                      <span>Nomor DANA Disalin!</span>
+                      <Check className="w-4 h-4 text-purple-400" />
+                      <span>Nomor DANA Berhasil Disalin!</span>
                     </>
                   ) : (
                     <>
@@ -442,7 +438,7 @@ export default function DepositView({ onOpenAuth }: { onOpenAuth: () => void }) 
                 type="button"
                 onClick={() => setStep(2)}
                 disabled={loading}
-                className="py-3 px-5 rounded-xl border border-zinc-800 text-zinc-400 hover:text-white text-xs font-semibold transition-colors disabled:opacity-50"
+                className="py-3 px-5 rounded-xl border border-zinc-700 text-zinc-300 hover:text-white text-xs font-semibold transition-colors disabled:opacity-50"
               >
                 Kembali
               </button>
@@ -451,7 +447,7 @@ export default function DepositView({ onOpenAuth }: { onOpenAuth: () => void }) 
                 type="button"
                 onClick={handleSubmitDeposit}
                 disabled={loading}
-                className="flex-1 py-3 px-6 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold text-xs transition-all shadow-lg active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
+                className="flex-1 py-3 px-6 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-black text-xs transition-all shadow-lg shadow-purple-600/40 active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {loading ? (
                   <>
@@ -470,19 +466,19 @@ export default function DepositView({ onOpenAuth }: { onOpenAuth: () => void }) 
         )}
       </div>
 
-      {/* Riwayat Deposit Section (Requirement #11) */}
-      <div className="bg-[#0c0c12] border border-zinc-800 rounded-3xl p-6 sm:p-8 shadow-xl">
+      {/* Riwayat Deposit Section */}
+      <div className="bg-[#0e081e] border border-purple-500/30 rounded-3xl p-6 sm:p-8 shadow-xl">
         <div className="flex items-center justify-between mb-5">
           <div>
-            <h3 className="text-lg font-bold text-white tracking-tight">Riwayat Deposit</h3>
-            <p className="text-xs text-zinc-400">Daftar mutasi saldo dan status konfirmasi admin</p>
+            <h3 className="text-lg font-black text-white tracking-tight">Riwayat Deposit</h3>
+            <p className="text-xs text-zinc-300">Daftar mutasi pengisian saldo dan status verifikasi admin</p>
           </div>
         </div>
 
         {deposits.length === 0 ? (
-          <div className="py-10 text-center border border-dashed border-zinc-800 rounded-2xl">
-            <Clock className="w-8 h-8 text-zinc-600 mx-auto mb-2" />
-            <p className="text-xs font-semibold text-zinc-400">Belum ada riwayat deposit</p>
+          <div className="py-10 text-center border border-dashed border-purple-900/40 rounded-2xl">
+            <Clock className="w-8 h-8 text-purple-400 mx-auto mb-2 opacity-60" />
+            <p className="text-xs font-semibold text-zinc-300">Belum ada riwayat deposit</p>
             <p className="text-[11px] text-zinc-500 mt-0.5">
               Isi form di atas untuk melakukan deposit saldo pertama Anda.
             </p>
@@ -491,7 +487,7 @@ export default function DepositView({ onOpenAuth }: { onOpenAuth: () => void }) 
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs border-collapse">
               <thead>
-                <tr className="border-b border-zinc-800 text-zinc-400 font-semibold uppercase tracking-wider text-[10px]">
+                <tr className="border-b border-purple-900/40 text-purple-300 font-bold uppercase tracking-wider text-[10px]">
                   <th className="pb-3 px-2">ID Deposit</th>
                   <th className="pb-3 px-2">Nominal</th>
                   <th className="pb-3 px-2">Pengirim</th>
@@ -500,20 +496,20 @@ export default function DepositView({ onOpenAuth }: { onOpenAuth: () => void }) 
                   <th className="pb-3 px-2 text-right">Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-900">
+              <tbody className="divide-y divide-[#170e30]">
                 {deposits.map((dep) => (
-                  <tr key={dep.id} className="hover:bg-zinc-900/30 transition-colors">
-                    <td className="py-3.5 px-2 font-mono text-zinc-300 text-[11px]">
+                  <tr key={dep.id} className="hover:bg-[#140b2a]/60 transition-colors">
+                    <td className="py-3.5 px-2 font-mono text-purple-300 text-[11px]">
                       #{dep.id.substring(0, 8)}
                     </td>
-                    <td className="py-3.5 px-2 font-bold text-white">
+                    <td className="py-3.5 px-2 font-black text-white">
                       Rp{dep.amount.toLocaleString('id-ID')}
                     </td>
-                    <td className="py-3.5 px-2 text-zinc-300 font-medium">
+                    <td className="py-3.5 px-2 text-zinc-200 font-medium">
                       {dep.senderName}
                     </td>
-                    <td className="py-3.5 px-2 text-zinc-400">
-                      <span className="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-[10px] font-semibold">
+                    <td className="py-3.5 px-2 text-zinc-300">
+                      <span className="px-2 py-0.5 rounded bg-[#160c2e] border border-purple-500/30 text-[10px] font-bold">
                         {dep.paymentMethod}
                       </span>
                     </td>
@@ -522,18 +518,18 @@ export default function DepositView({ onOpenAuth }: { onOpenAuth: () => void }) 
                     </td>
                     <td className="py-3.5 px-2 text-right">
                       {dep.status === 'PENDING' && (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-950/50 border border-amber-500/30 text-amber-300 font-semibold text-[11px]">
-                          🟡 PENDING
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-950/60 border border-amber-500/40 text-amber-300 font-bold text-[11px]">
+                          PENDING
                         </span>
                       )}
                       {dep.status === 'APPROVED' && (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-950/50 border border-emerald-500/30 text-emerald-300 font-semibold text-[11px]">
-                          🟢 APPROVED
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-purple-950/60 border border-purple-500/40 text-purple-300 font-bold text-[11px]">
+                          APPROVED
                         </span>
                       )}
                       {dep.status === 'REJECTED' && (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-rose-950/50 border border-rose-500/30 text-rose-300 font-semibold text-[11px]">
-                          🔴 REJECTED
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-rose-950/60 border border-rose-500/40 text-rose-300 font-bold text-[11px]">
+                          REJECTED
                         </span>
                       )}
                     </td>

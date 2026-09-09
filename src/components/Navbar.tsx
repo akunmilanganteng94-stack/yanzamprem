@@ -14,6 +14,8 @@ import {
   MessageCircle
 } from 'lucide-react';
 
+const YANZSTR_LOGO_URL = 'https://cdn.phototourl.com/free/2026-09-09-ad32f784-664e-4789-a562-cf7b35289053.jpg';
+
 interface NavbarProps {
   currentTab: string;
   setCurrentTab: (tab: string) => void;
@@ -39,7 +41,7 @@ export default function Navbar({ currentTab, setCurrentTab, onOpenAuth, onOpenWh
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-[#050507]/90 backdrop-blur-xl border-b border-zinc-800/80">
+    <header className="sticky top-0 z-40 w-full bg-[#080512]/90 backdrop-blur-xl border-b border-purple-900/40 shadow-lg shadow-purple-950/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Brand Logo & Name */}
@@ -47,35 +49,43 @@ export default function Navbar({ currentTab, setCurrentTab, onOpenAuth, onOpenWh
             <button
               id="brand-logo-btn"
               onClick={() => handleNavClick('home')}
-              className="flex items-center gap-2.5 text-left group focus:outline-none"
+              className="flex items-center gap-3 text-left group focus:outline-none"
             >
-              <div className="w-9 h-9 rounded-xl bg-white flex items-center justify-center overflow-hidden border border-purple-400/40 shadow-md shadow-purple-500/20 group-hover:scale-105 transition-transform">
-                <img src="https://cdn.phototourl.com/free/2026-09-09-ad32f784-664e-4789-a562-cf7b35289053.jpg" alt="YANZSTR" className="w-full h-full object-contain" />
+              <div className="relative w-10 h-10 rounded-xl overflow-hidden border border-purple-500/50 shadow-md shadow-purple-600/30 group-hover:scale-105 transition-transform bg-black">
+                <img
+                  src={YANZSTR_LOGO_URL}
+                  alt="YANZSTR Logo"
+                  className="w-full h-full object-cover"
+                  referrerPolicy="no-referrer"
+                />
               </div>
               <div className="flex flex-col">
-                <span className="font-extrabold text-base tracking-wider text-white">
-                  YANZSTR
-                </span>
-                <span className="text-[10px] text-zinc-400 font-medium -mt-1 tracking-widest uppercase">
-                  Premium Store
+                <div className="flex items-center gap-1.5">
+                  <span className="font-extrabold text-base tracking-wider text-white">
+                    YANZSTR
+                  </span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse" />
+                </div>
+                <span className="text-[10px] text-purple-300 font-semibold -mt-1 tracking-widest uppercase">
+                  Digital Premium
                 </span>
               </div>
             </button>
 
             {/* Store Status Pill */}
             <div
-              className={`hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium border ${
+              className={`hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold border ${
                 settings.storeStatus === 'OPEN'
-                  ? 'bg-emerald-950/40 border-emerald-500/30 text-emerald-400'
-                  : 'bg-rose-950/40 border-rose-500/30 text-rose-400'
+                  ? 'bg-purple-950/60 border-purple-500/40 text-purple-300'
+                  : 'bg-rose-950/60 border-rose-500/40 text-rose-300'
               }`}
             >
               <span
-                className={`w-1.5 h-1.5 rounded-full ${
-                  settings.storeStatus === 'OPEN' ? 'bg-emerald-400 animate-pulse' : 'bg-rose-400'
+                className={`w-2 h-2 rounded-full ${
+                  settings.storeStatus === 'OPEN' ? 'bg-purple-400 animate-pulse' : 'bg-rose-400'
                 }`}
               />
-              <span>{settings.storeStatus === 'OPEN' ? 'OPEN' : 'CLOSED'}</span>
+              <span>{settings.storeStatus === 'OPEN' ? 'STORE OPEN' : 'STORE CLOSED'}</span>
             </div>
           </div>
 
@@ -91,11 +101,11 @@ export default function Navbar({ currentTab, setCurrentTab, onOpenAuth, onOpenWh
                   onClick={() => handleNavClick(item.id)}
                   className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold tracking-wide transition-all ${
                     isActive
-                      ? 'bg-zinc-800 text-white shadow-inner'
-                      : 'text-zinc-400 hover:text-zinc-100 hover:bg-zinc-900/60'
+                      ? 'bg-purple-600/20 text-white border border-purple-500/40 shadow-inner'
+                      : 'text-zinc-300 hover:text-white hover:bg-purple-950/30'
                   }`}
                 >
-                  <Icon className="w-4 h-4" />
+                  <Icon className={`w-4 h-4 ${isActive ? 'text-purple-400' : 'text-zinc-400'}`} />
                   <span>{item.label}</span>
                 </button>
               );
@@ -105,13 +115,13 @@ export default function Navbar({ currentTab, setCurrentTab, onOpenAuth, onOpenWh
               <button
                 id="nav-admin-btn"
                 onClick={() => handleNavClick('admin')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${
+                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all border ${
                   currentTab === 'admin'
-                    ? 'bg-white text-black border-white'
-                    : 'bg-zinc-900 text-zinc-200 border-zinc-700 hover:border-zinc-500'
+                    ? 'bg-purple-600 text-white border-purple-400 shadow-lg shadow-purple-600/30'
+                    : 'bg-[#150e2a] text-purple-200 border-purple-500/40 hover:bg-purple-900/50'
                 }`}
               >
-                <Shield className="w-3.5 h-3.5 text-amber-400" />
+                <Shield className="w-3.5 h-3.5 text-purple-300" />
                 <span>Admin Panel</span>
               </button>
             )}
@@ -125,15 +135,15 @@ export default function Navbar({ currentTab, setCurrentTab, onOpenAuth, onOpenWh
                 <button
                   id="navbar-balance-btn"
                   onClick={() => handleNavClick('deposit')}
-                  className="flex items-center gap-2 px-3 py-1.5 bg-zinc-900/90 border border-zinc-800 hover:border-zinc-700 rounded-xl transition-all shadow-sm"
+                  className="flex items-center gap-2.5 px-3 py-1.5 bg-[#120b24] border border-purple-500/30 hover:border-purple-400 rounded-xl transition-all shadow-sm shadow-purple-900/20 group"
                   title="Klik untuk Deposit Saldo"
                 >
-                  <div className="w-6 h-6 rounded-lg bg-zinc-800 flex items-center justify-center text-zinc-300">
+                  <div className="w-6 h-6 rounded-lg bg-purple-950 border border-purple-500/30 flex items-center justify-center text-purple-300 group-hover:bg-purple-600 group-hover:text-white transition-colors">
                     <Wallet className="w-3.5 h-3.5" />
                   </div>
                   <div className="flex flex-col text-left">
-                    <span className="text-[10px] text-zinc-400 leading-none">Saldo</span>
-                    <span className="text-xs font-bold text-white tracking-tight leading-tight">
+                    <span className="text-[10px] text-purple-300/80 leading-none">Saldo</span>
+                    <span className="text-xs font-black text-white tracking-tight leading-tight">
                       Rp{(userProfile.balance || 0).toLocaleString('id-ID')}
                     </span>
                   </div>
@@ -143,7 +153,7 @@ export default function Navbar({ currentTab, setCurrentTab, onOpenAuth, onOpenWh
                 <button
                   id="navbar-user-btn"
                   onClick={() => handleNavClick('account')}
-                  className="hidden sm:flex items-center justify-center w-9 h-9 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-white hover:border-zinc-700 transition-colors"
+                  className="hidden sm:flex items-center justify-center w-9 h-9 rounded-xl bg-[#120b24] border border-purple-500/30 text-purple-200 hover:text-white hover:border-purple-400 transition-colors"
                   title={userProfile.name}
                 >
                   <User className="w-4 h-4" />
@@ -153,7 +163,7 @@ export default function Navbar({ currentTab, setCurrentTab, onOpenAuth, onOpenWh
               <button
                 id="navbar-login-btn"
                 onClick={onOpenAuth}
-                className="px-4 py-2 rounded-xl bg-white hover:bg-zinc-200 text-black text-xs font-bold tracking-wide transition-all shadow-md active:scale-95"
+                className="px-4 py-2 rounded-xl bg-white hover:bg-purple-100 text-black text-xs font-bold tracking-wide transition-all shadow-md shadow-white/10 active:scale-95"
               >
                 Masuk / Daftar
               </button>
@@ -163,7 +173,7 @@ export default function Navbar({ currentTab, setCurrentTab, onOpenAuth, onOpenWh
             <button
               id="mobile-menu-toggle-btn"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden flex items-center justify-center w-9 h-9 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-white"
+              className="md:hidden flex items-center justify-center w-9 h-9 rounded-xl bg-[#120b24] border border-purple-900/50 text-purple-200 hover:text-white"
               aria-label="Toggle Navigation Menu"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -174,16 +184,16 @@ export default function Navbar({ currentTab, setCurrentTab, onOpenAuth, onOpenWh
 
       {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-zinc-800/80 bg-[#07070b] px-4 pt-3 pb-5 space-y-2">
+        <div className="md:hidden border-t border-purple-900/40 bg-[#090514] px-4 pt-3 pb-5 space-y-2">
           {/* Store status on mobile */}
-          <div className="flex items-center justify-between py-2 px-3 bg-zinc-900/60 rounded-xl mb-3 border border-zinc-800">
-            <span className="text-xs text-zinc-400">Status Toko:</span>
+          <div className="flex items-center justify-between py-2 px-3 bg-[#130d24] rounded-xl mb-3 border border-purple-900/50">
+            <span className="text-xs text-purple-300">Status Toko:</span>
             <span
-              className={`text-xs font-semibold ${
-                settings.storeStatus === 'OPEN' ? 'text-emerald-400' : 'text-rose-400'
+              className={`text-xs font-bold ${
+                settings.storeStatus === 'OPEN' ? 'text-purple-300' : 'text-rose-400'
               }`}
             >
-              {settings.storeStatus === 'OPEN' ? '● Toko Buka' : '● Toko Tutup'}
+              {settings.storeStatus === 'OPEN' ? 'STORE OPEN' : 'STORE CLOSED'}
             </span>
           </div>
 
@@ -196,14 +206,16 @@ export default function Navbar({ currentTab, setCurrentTab, onOpenAuth, onOpenWh
                 id={`mobile-nav-${item.id}`}
                 onClick={() => handleNavClick(item.id)}
                 className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                  isActive ? 'bg-zinc-800 text-white font-semibold' : 'text-zinc-300 hover:bg-zinc-900'
+                  isActive
+                    ? 'bg-purple-600/30 border border-purple-500/40 text-white font-bold'
+                    : 'text-zinc-300 hover:bg-[#150e2a]'
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <Icon className="w-4 h-4 text-zinc-400" />
+                  <Icon className={`w-4 h-4 ${isActive ? 'text-purple-400' : 'text-zinc-400'}`} />
                   <span>{item.label}</span>
                 </div>
-                <ChevronRight className="w-4 h-4 text-zinc-600" />
+                <ChevronRight className="w-4 h-4 text-purple-400/50" />
               </button>
             );
           })}
@@ -212,26 +224,26 @@ export default function Navbar({ currentTab, setCurrentTab, onOpenAuth, onOpenWh
             <button
               id="mobile-nav-admin"
               onClick={() => handleNavClick('admin')}
-              className="w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-bold bg-zinc-900 border border-amber-500/30 text-amber-300 hover:bg-zinc-850"
+              className="w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-bold bg-[#170e2f] border border-purple-500/40 text-purple-200 hover:bg-purple-900/40"
             >
               <div className="flex items-center gap-3">
-                <Shield className="w-4 h-4 text-amber-400" />
+                <Shield className="w-4 h-4 text-purple-300" />
                 <span>Admin Panel</span>
               </div>
-              <ChevronRight className="w-4 h-4 text-amber-400/50" />
+              <ChevronRight className="w-4 h-4 text-purple-400/50" />
             </button>
           )}
 
-          <div className="pt-2 border-t border-zinc-800 space-y-2">
+          <div className="pt-2 border-t border-purple-900/40 space-y-2">
             <button
               id="mobile-nav-wa-btn"
               onClick={() => {
                 onOpenWhatsApp();
                 setMobileMenuOpen(false);
               }}
-              className="w-full flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-xs font-medium text-emerald-400 hover:bg-emerald-950/20"
+              className="w-full flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-purple-300 hover:bg-purple-950/40"
             >
-              <MessageCircle className="w-4 h-4" />
+              <MessageCircle className="w-4 h-4 text-purple-400" />
               <span>Saluran WhatsApp YANZSTR</span>
             </button>
 
@@ -242,7 +254,7 @@ export default function Navbar({ currentTab, setCurrentTab, onOpenAuth, onOpenWh
                   logout();
                   setMobileMenuOpen(false);
                 }}
-                className="w-full flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-xs font-medium text-rose-400 hover:bg-rose-950/20"
+                className="w-full flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-rose-400 hover:bg-rose-950/30"
               >
                 <LogOut className="w-4 h-4" />
                 <span>Logout</span>
